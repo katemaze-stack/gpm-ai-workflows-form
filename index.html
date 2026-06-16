@@ -1,0 +1,658 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>GPM AI Workflows — Submit Update</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --ink: #111110;
+    --white: #ffffff;
+    --surface: #F7F6F3;
+    --border: #E4E2DC;
+    --border-strong: #C8C4BC;
+    --muted: #888278;
+    --subtle: #B4B0A8;
+    --blue: #1847CC;
+    --blue-bg: #EEF2FC;
+    --green: #0C6E45;
+    --green-bg: #E8F5EE;
+    --green-border: #7FD4A8;
+    --amber: #8A4D08;
+    --amber-bg: #FDF2E3;
+    --amber-border: #F0B755;
+    --red: #A61C1C;
+    --red-bg: #FEF0F0;
+    --red-border: #F5A0A0;
+    --slate-bg: #EDECEA;
+    --slate-border: #C8C4BC;
+    --ln-red: #CC0000;
+    --radius: 6px;
+    --radius-lg: 10px;
+  }
+
+  html { font-size: 16px; }
+
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+    background: var(--surface);
+    color: var(--ink);
+    min-height: 100vh;
+    padding: 40px 16px 80px;
+    line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .page {
+    max-width: 560px;
+    margin: 0 auto;
+  }
+
+  /* ── Header ── */
+  .header {
+    display: flex;
+    align-items: flex-start;
+    gap: 14px;
+    margin-bottom: 28px;
+    padding-bottom: 24px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .header-logo {
+    width: 36px;
+    height: 36px;
+    background: var(--ln-red);
+    border-radius: var(--radius);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    margin-top: 2px;
+  }
+
+  .header-logo svg { display: block; }
+
+  .header-text {}
+  .header-eyebrow {
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.07em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 3px;
+  }
+
+  .header-title {
+    font-size: 20px;
+    font-weight: 700;
+    color: var(--ink);
+    letter-spacing: -0.3px;
+    line-height: 1.2;
+  }
+
+  /* ── Tabs ── */
+  .tabs {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0;
+    background: var(--border);
+    border-radius: var(--radius);
+    padding: 2px;
+    margin-bottom: 24px;
+  }
+
+  .tab {
+    padding: 9px;
+    font-size: 13px;
+    font-weight: 500;
+    border: none;
+    border-radius: 5px;
+    background: transparent;
+    color: var(--muted);
+    cursor: pointer;
+    transition: all 0.12s;
+    font-family: inherit;
+    text-align: center;
+  }
+
+  .tab.active {
+    background: var(--white);
+    color: var(--ink);
+    box-shadow: 0 1px 2px rgba(0,0,0,0.06);
+  }
+
+  /* ── Fields ── */
+  .field { margin-bottom: 16px; }
+
+  .field label {
+    display: flex;
+    align-items: baseline;
+    gap: 6px;
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--ink);
+    margin-bottom: 5px;
+  }
+
+  .opt {
+    font-size: 11px;
+    font-weight: 400;
+    color: var(--subtle);
+  }
+
+  select, input[type="text"], input[type="date"], textarea {
+    width: 100%;
+    padding: 9px 11px;
+    font-size: 14px;
+    font-family: inherit;
+    color: var(--ink);
+    background: var(--white);
+    border: 1px solid var(--border-strong);
+    border-radius: var(--radius);
+    outline: none;
+    transition: border-color 0.12s, box-shadow 0.12s;
+    appearance: none;
+    -webkit-appearance: none;
+    line-height: 1.5;
+  }
+
+  select {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23888278' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 11px center;
+    padding-right: 32px;
+    cursor: pointer;
+  }
+
+  select:focus, input:focus, textarea:focus {
+    border-color: var(--blue);
+    box-shadow: 0 0 0 3px rgba(24,71,204,0.08);
+  }
+
+  textarea {
+    resize: vertical;
+    min-height: 84px;
+    line-height: 1.6;
+  }
+
+  .two-col {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+  }
+
+  /* ── Status pills ── */
+  .status-group {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+
+  .pill {
+    padding: 5px 13px;
+    font-size: 12px;
+    font-weight: 500;
+    border-radius: 999px;
+    border: 1px solid var(--border-strong);
+    background: var(--white);
+    color: var(--muted);
+    cursor: pointer;
+    transition: all 0.1s;
+    font-family: inherit;
+    user-select: none;
+  }
+
+  .pill:hover { border-color: var(--ink); color: var(--ink); }
+
+  .pill.on-track  { background: var(--green-bg);  color: var(--green);  border-color: var(--green-border); }
+  .pill.at-risk   { background: var(--amber-bg);  color: var(--amber);  border-color: var(--amber-border); }
+  .pill.blocked   { background: var(--red-bg);    color: var(--red);    border-color: var(--red-border); }
+  .pill.complete  { background: var(--blue-bg);   color: var(--blue);   border-color: #93B4F7; }
+  .pill.not-started { background: var(--slate-bg); color: var(--muted); border-color: var(--slate-border); }
+
+  /* ── Divider ── */
+  .divider {
+    border: none;
+    border-top: 1px solid var(--border);
+    margin: 20px 0;
+  }
+
+  /* ── Submit ── */
+  .submit-btn {
+    width: 100%;
+    padding: 12px;
+    font-size: 14px;
+    font-weight: 600;
+    font-family: inherit;
+    background: var(--ink);
+    color: var(--white);
+    border: none;
+    border-radius: var(--radius);
+    cursor: pointer;
+    transition: opacity 0.12s;
+    margin-top: 4px;
+    letter-spacing: 0.01em;
+  }
+
+  .submit-btn:hover { opacity: 0.82; }
+  .submit-btn:active { opacity: 0.7; }
+  .submit-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+
+  /* ── States ── */
+  .sending {
+    display: none;
+    text-align: center;
+    padding: 2.5rem 1rem;
+    color: var(--muted);
+    font-size: 14px;
+  }
+
+  .spinner {
+    width: 28px;
+    height: 28px;
+    border: 2.5px solid var(--border);
+    border-top-color: var(--ink);
+    border-radius: 50%;
+    animation: spin 0.7s linear infinite;
+    margin: 0 auto 12px;
+  }
+
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  .success {
+    display: none;
+    text-align: center;
+    padding: 2.5rem 1rem;
+  }
+
+  .success-icon {
+    width: 48px;
+    height: 48px;
+    background: var(--green);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 16px;
+  }
+
+  .success h2 {
+    font-size: 17px;
+    font-weight: 700;
+    color: var(--ink);
+    margin-bottom: 6px;
+  }
+
+  .success p {
+    font-size: 13px;
+    color: var(--muted);
+    max-width: 320px;
+    margin: 0 auto 20px;
+    line-height: 1.6;
+  }
+
+  .another-btn {
+    padding: 9px 22px;
+    font-size: 13px;
+    font-weight: 500;
+    font-family: inherit;
+    background: transparent;
+    color: var(--ink);
+    border: 1px solid var(--border-strong);
+    border-radius: 999px;
+    cursor: pointer;
+    transition: background 0.12s;
+  }
+
+  .another-btn:hover { background: var(--border); }
+
+  .error-banner {
+    display: none;
+    background: var(--red-bg);
+    border: 1px solid var(--red-border);
+    border-radius: var(--radius);
+    padding: 10px 14px;
+    font-size: 13px;
+    color: var(--red);
+    margin-bottom: 14px;
+    line-height: 1.5;
+  }
+
+  .field-error {
+    font-size: 12px;
+    color: var(--red);
+    margin-top: 4px;
+    display: none;
+  }
+
+  @media (max-width: 480px) {
+    .two-col { grid-template-columns: 1fr; }
+    body { padding: 24px 14px 60px; }
+  }
+</style>
+</head>
+<body>
+<div class="page">
+
+  <div class="header">
+    <div class="header-logo">
+      <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M10 2L12.5 7.5H18L13.5 11L15.5 17L10 13.5L4.5 17L6.5 11L2 7.5H7.5L10 2Z" fill="white" opacity="0.9"/>
+      </svg>
+    </div>
+    <div class="header-text">
+      <div class="header-eyebrow">Live Nation / Ticketmaster</div>
+      <div class="header-title">GPM AI Workflows</div>
+    </div>
+  </div>
+
+  <div id="form-wrap">
+    <div class="tabs">
+      <button class="tab active" id="tab-update" onclick="setMode('update')">Update existing task</button>
+      <button class="tab" id="tab-new" onclick="setMode('new')">Add new task</button>
+    </div>
+
+    <div id="error-banner" class="error-banner"></div>
+
+    <!-- UPDATE MODE -->
+    <div id="section-update">
+      <div class="field">
+        <label>Task</label>
+        <select id="task-select">
+          <option value="">Select a task…</option>
+          <optgroup label="🚀 GTM Workflow Automation">
+            <option value="1215757154268885">Build end-to-end GTM workflow + AI agent(s) — Drea</option>
+            <option value="1215757153616117">Design standardized product brief agent — Bryan</option>
+            <option value="1215757239590265">Pilot JIRA/Airtable connector — Bryan + Nick</option>
+            <option value="1215757459978340">[BLOCKER] GTM T1 timeline misalignment</option>
+          </optgroup>
+          <optgroup label="🎨 Content & Asset Production">
+            <option value="1215757154380980">Build AI-powered content templates — Kelley + Matt</option>
+            <option value="1215757466208313">Lead Lynda project — Kate + Kelley</option>
+          </optgroup>
+          <optgroup label="🎫 Asset Concierge">
+            <option value="1215757153740762">Build Music asset concierge — Jack + Kimmy</option>
+            <option value="1215757153616135">Define expansion scope beyond Music</option>
+          </optgroup>
+          <optgroup label="⚙️ Foundations">
+            <option value="foundations-messaging">Messaging Framework Standardization — Michael</option>
+            <option value="foundations-brief">Product Brief Standardization — Bryan</option>
+            <option value="foundations-roadmap">Roadmap Visibility — Bryan + Nick</option>
+          </optgroup>
+        </select>
+        <div class="field-error" id="err-task">Please select a task.</div>
+      </div>
+
+      <div class="field">
+        <label>Status</label>
+        <div class="status-group" id="status-group">
+          <button class="pill" data-val="🟢 On track"    data-slug="on-track"    onclick="setStatus(this)">🟢 On track</button>
+          <button class="pill" data-val="🟡 At risk"     data-slug="at-risk"     onclick="setStatus(this)">🟡 At risk</button>
+          <button class="pill" data-val="🔴 Blocked"     data-slug="blocked"     onclick="setStatus(this)">🔴 Blocked</button>
+          <button class="pill" data-val="✅ Complete"    data-slug="complete"    onclick="setStatus(this)">✅ Complete</button>
+          <button class="pill" data-val="⚪ Not started" data-slug="not-started" onclick="setStatus(this)">⚪ Not started</button>
+        </div>
+        <div class="field-error" id="err-status">Please select a status.</div>
+      </div>
+
+      <div class="field">
+        <label>Progress update</label>
+        <textarea id="progress" placeholder="What's happened since the last update?"></textarea>
+        <div class="field-error" id="err-progress">Please describe what's happened.</div>
+      </div>
+
+      <div class="field">
+        <label>Next action</label>
+        <input type="text" id="next-action" placeholder="e.g. Kick off brief agent design session">
+        <div class="field-error" id="err-next">Please enter a next action.</div>
+      </div>
+
+      <div class="field">
+        <label>Blocker <span class="opt">optional</span></label>
+        <input type="text" id="blocker" placeholder="Describe any blocker or dependency">
+      </div>
+
+      <div class="field">
+        <label>Links <span class="opt">optional</span></label>
+        <input type="text" id="links" placeholder="Paste URL(s), comma-separated">
+      </div>
+
+      <div class="field">
+        <label>Your name</label>
+        <input type="text" id="u-name" placeholder="e.g. Drea">
+        <div class="field-error" id="err-uname">Please enter your name.</div>
+      </div>
+
+      <button class="submit-btn" id="submit-update" onclick="submitUpdate()">Save update</button>
+    </div>
+
+    <!-- NEW TASK MODE -->
+    <div id="section-new" style="display:none;">
+      <div class="field">
+        <label>Workstream</label>
+        <select id="new-workstream">
+          <option value="">Select a workstream…</option>
+          <option value="🚀 GTM Workflow Automation">🚀 GTM Workflow Automation</option>
+          <option value="🎨 Content & Asset Production">🎨 Content & Asset Production</option>
+          <option value="🎫 Asset Concierge">🎫 Asset Concierge</option>
+          <option value="⚙️ Foundations & Dependencies">⚙️ Foundations & Dependencies</option>
+        </select>
+        <div class="field-error" id="err-nws">Please select a workstream.</div>
+      </div>
+
+      <div class="field">
+        <label>Task name</label>
+        <input type="text" id="new-name" placeholder="e.g. Define success metrics for asset concierge">
+        <div class="field-error" id="err-nname">Please enter a task name.</div>
+      </div>
+
+      <div class="field">
+        <label>Description <span class="opt">optional</span></label>
+        <textarea id="new-desc" placeholder="What does this task involve?"></textarea>
+      </div>
+
+      <div class="two-col">
+        <div class="field">
+          <label>Owner</label>
+          <input type="text" id="new-owner" placeholder="Name">
+          <div class="field-error" id="err-nowner">Please enter an owner.</div>
+        </div>
+        <div class="field">
+          <label>Due date <span class="opt">optional</span></label>
+          <input type="date" id="new-due">
+        </div>
+      </div>
+
+      <div class="field">
+        <label>Links <span class="opt">optional</span></label>
+        <input type="text" id="new-links" placeholder="Paste URL(s), comma-separated">
+      </div>
+
+      <div class="field">
+        <label>Your name</label>
+        <input type="text" id="new-submitter" placeholder="e.g. Kate">
+        <div class="field-error" id="err-nsub">Please enter your name.</div>
+      </div>
+
+      <button class="submit-btn" id="submit-new" onclick="submitNew()">Add task</button>
+    </div>
+  </div>
+
+  <!-- SENDING -->
+  <div class="sending" id="sending-state">
+    <div class="spinner"></div>
+    Saving your update…
+  </div>
+
+  <!-- SUCCESS -->
+  <div class="success" id="success-state">
+    <div class="success-icon">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+        <polyline points="20 6 9 17 4 12"></polyline>
+      </svg>
+    </div>
+    <h2>Update saved</h2>
+    <p>Your update has been logged. Kate will include it in the Tuesday brief.</p>
+    <button class="another-btn" onclick="resetForm()">Submit another</button>
+  </div>
+
+</div>
+
+<script>
+  const WEBHOOK = 'https://hooks.slack.com/services/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';
+  let selectedStatus = '';
+  let currentMode = 'update';
+
+  function setMode(mode) {
+    currentMode = mode;
+    document.getElementById('section-update').style.display = mode === 'update' ? '' : 'none';
+    document.getElementById('section-new').style.display    = mode === 'new'    ? '' : 'none';
+    document.getElementById('tab-update').classList.toggle('active', mode === 'update');
+    document.getElementById('tab-new').classList.toggle('active',    mode === 'new');
+    clearErrors();
+  }
+
+  function setStatus(btn) {
+    document.querySelectorAll('.pill').forEach(p => p.className = 'pill');
+    btn.classList.add(btn.dataset.slug);
+    selectedStatus = btn.dataset.val;
+    hide('err-status');
+  }
+
+  function show(id) { document.getElementById(id).style.display = 'block'; }
+  function hide(id) { document.getElementById(id).style.display = 'none'; }
+
+  function clearErrors() {
+    document.querySelectorAll('.field-error').forEach(el => el.style.display = 'none');
+    hide('error-banner');
+  }
+
+  function showBanner(msg) {
+    const b = document.getElementById('error-banner');
+    b.textContent = msg;
+    b.style.display = 'block';
+  }
+
+  function val(id) { return document.getElementById(id).value.trim(); }
+
+  async function postToSlack(text) {
+    const res = await fetch(WEBHOOK, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ text })
+    });
+    if (!res.ok) throw new Error('Slack error ' + res.status);
+  }
+
+  function showSending() {
+    hide('form-wrap');
+    show('sending-state');
+  }
+
+  function showSuccess() {
+    hide('sending-state');
+    show('success-state');
+  }
+
+  function showFormAgain() {
+    hide('sending-state');
+    hide('success-state');
+    show('form-wrap');
+  }
+
+  async function submitUpdate() {
+    clearErrors();
+    const task     = val('task-select') ? document.getElementById('task-select') : null;
+    const taskVal  = document.getElementById('task-select').value;
+    const taskLabel = document.getElementById('task-select').options[document.getElementById('task-select').selectedIndex]?.text || '';
+    const progress = val('progress');
+    const next     = val('next-action');
+    const name     = val('u-name');
+    const blocker  = val('blocker');
+    const links    = val('links');
+
+    let valid = true;
+    if (!taskVal)      { show('err-task');     valid = false; }
+    if (!selectedStatus) { show('err-status'); valid = false; }
+    if (!progress)     { show('err-progress'); valid = false; }
+    if (!next)         { show('err-next');     valid = false; }
+    if (!name)         { show('err-uname');    valid = false; }
+    if (!valid) return;
+
+    const lines = [
+      `📋 *GPM AI Workflows — Task Update*`,
+      ``,
+      `*Submitted by:* ${name}`,
+      `*Task:* ${taskLabel}`,
+      `*Task GID:* ${taskVal}`,
+      `*Status:* ${selectedStatus}`,
+      ``,
+      `*Progress:* ${progress}`,
+      `*Next action:* ${next}`,
+      blocker ? `*Blocker:* ${blocker}` : null,
+      links   ? `*Links:* ${links}`     : null,
+    ].filter(l => l !== null).join('\n');
+
+    showSending();
+    try {
+      await postToSlack(lines);
+      showSuccess();
+    } catch(e) {
+      showFormAgain();
+      showBanner('Something went wrong sending your update. Please try again or contact Kate.');
+    }
+  }
+
+  async function submitNew() {
+    clearErrors();
+    const ws       = val('new-workstream') ? document.getElementById('new-workstream').value : '';
+    const name     = val('new-name');
+    const owner    = val('new-owner');
+    const submitter = val('new-submitter');
+    const desc     = val('new-desc');
+    const due      = val('new-due');
+    const links    = val('new-links');
+
+    let valid = true;
+    if (!ws)        { show('err-nws');    valid = false; }
+    if (!name)      { show('err-nname');  valid = false; }
+    if (!owner)     { show('err-nowner'); valid = false; }
+    if (!submitter) { show('err-nsub');   valid = false; }
+    if (!valid) return;
+
+    const lines = [
+      `✅ *GPM AI Workflows — New Task*`,
+      ``,
+      `*Submitted by:* ${submitter}`,
+      `*Workstream:* ${ws}`,
+      `*Task name:* ${name}`,
+      owner ? `*Owner:* ${owner}` : null,
+      due   ? `*Due date:* ${due}` : null,
+      desc  ? `*Description:* ${desc}` : null,
+      links ? `*Links:* ${links}` : null,
+    ].filter(l => l !== null).join('\n');
+
+    showSending();
+    try {
+      await postToSlack(lines);
+      showSuccess();
+    } catch(e) {
+      showFormAgain();
+      showBanner('Something went wrong sending your update. Please try again or contact Kate.');
+    }
+  }
+
+  function resetForm() {
+    hide('success-state');
+    show('form-wrap');
+    selectedStatus = '';
+    document.querySelectorAll('input[type=text], input[type=date], textarea').forEach(el => el.value = '');
+    document.querySelectorAll('select').forEach(el => el.selectedIndex = 0);
+    document.querySelectorAll('.pill').forEach(p => p.className = 'pill');
+    clearErrors();
+  }
+</script>
+</body>
+</html>
